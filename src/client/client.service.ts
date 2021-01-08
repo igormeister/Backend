@@ -1,13 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { string } from 'yargs';
 import { ClientDto, BasketDto, AuctionDto, LotDto } from './dto/client.dto';
 import { Client, Basket, Auction, Lot } from './interfaces/client.interface';
 
 @Injectable()
 export class ClientService {
 
-  constructor(@Inject('CLIENT_MODEL') private readonly ClientModel: Model<Client>) {}
+  constructor(@Inject('CLIENT_MODEL') private readonly ClientModel: Model<Client>) { }
 
   async addUser(ClientDto: ClientDto): Promise<Client> {
     const createdClient = new this.ClientModel(ClientDto);
@@ -23,10 +22,15 @@ export class ClientService {
 @Injectable()
 export class BasketService {
 
-  constructor(@Inject('BASKET_MODEL') private readonly BasketModel: Model<Basket>) {}
+  async addBasket(BasketDto: BasketDto): Promise<Basket> {
+    const createdBasket = new this.BasketModel(BasketDto);
+    return await createdBasket.save();
+  }
 
-    async getBasket(BasketID: string): Promise<Basket> {
-      return await this.BasketModel.findOne({ user_uuid: BasketID }).exec();
+  constructor(@Inject('BASKET_MODEL') private readonly BasketModel: Model<Basket>) { }
+
+  async getBasket(BasketID: string): Promise<Basket> {
+    return await this.BasketModel.findOne({ user_uuid: BasketID }).exec();
   }
 
 }
@@ -34,10 +38,10 @@ export class BasketService {
 @Injectable()
 export class AuctionService {
 
-  constructor(@Inject('AUCTION_MODEL') private readonly AuctionModel: Model<Auction>) {}
+  constructor(@Inject('AUCTION_MODEL') private readonly AuctionModel: Model<Auction>) { }
 
   async getAuctions(): Promise<Auction[]> {
-    const Auctions = await this.AuctionModel.find().exec();
+    const Auctions = await this.AuctionModel.find({ redeemed: false }).exec();
     return Auctions;
   }
 
@@ -47,17 +51,17 @@ export class AuctionService {
   }
 
   async addAuction(AuctionDto: AuctionDto): Promise<Auction> {
-    const createdAuction =  new this.AuctionModel(AuctionDto);
+    const createdAuction = new this.AuctionModel(AuctionDto);
     return await createdAuction.save();
   }
 
   async editAuction(AuctionID: string, AuctionDto: AuctionDto): Promise<Auction> {
-    const editedAuction = await this.AuctionModel.findOneAndUpdate({ auction_uuid: AuctionID }, AuctionDto, { new: true });
+    const editedAuction = await this.AuctionModel.updateOne({ auction_uuid: AuctionID }, AuctionDto, { new: true });
     return editedAuction;
   }
 
-  async deleteAuction(AuctionID: string, AuctionDto: AuctionDto): Promise<Auction> {
-    const deletedAuction = await this.AuctionModel.findOneAndRemove({ auction_uuid: AuctionID });
+  async deleteAuction(AuctionID: string): Promise<Auction> {
+    const deletedAuction = await this.AuctionModel.deleteOne({ auction_uuid: AuctionID });
     return deletedAuction;
   }
 
@@ -66,10 +70,10 @@ export class AuctionService {
 @Injectable()
 export class LotService {
 
-  constructor(@Inject('LOT_MODEL') private readonly LotModel: Model<Lot>) {}
+  constructor(@Inject('LOT_MODEL') private readonly LotModel: Model<Lot>) { }
 
   async getLots(): Promise<Lot[]> {
-    const Lots = await this.LotModel.find().exec();
+    const Lots = await this.LotModel.find({ redeemed: false }).exec();
     return Lots;
   }
 
@@ -79,17 +83,17 @@ export class LotService {
   }
 
   async addLot(LotDto: LotDto): Promise<Lot> {
-    const createdLot =  new this.LotModel(LotDto);
+    const createdLot = new this.LotModel(LotDto);
     return await createdLot.save();
   }
 
   async editLot(LotID: string, LotDto: LotDto): Promise<Lot> {
-    const editedLot = await this.LotModel.findOneAndUpdate({ lot_uuid: LotID }, LotDto, { new: true });
+    const editedLot = await this.LotModel.updateOne({ lot_uuid: LotID }, LotDto, { new: true });
     return editedLot;
   }
 
-  async deleteLot(LotID: string, LotDto: LotDto): Promise<Lot> {
-    const deletedLot = await this.LotModel.findOneAndRemove({ lot_uuid: LotID });
+  async deleteLot(LotID: string): Promise<Lot> {
+    const deletedLot = await this.LotModel.deleteOne({ lot_uuid: LotID });
     return deletedLot;
   }
 

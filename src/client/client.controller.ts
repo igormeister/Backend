@@ -12,7 +12,7 @@ export class ClientController {
     return this.ClientService.addUser(ClientDto);
   }
 
-  @Get('/getUser/:user_login')
+  @Get('/getUser/:ClientID')
   async getUser(@Param('ClientID') ClientID: string) {
     return this.ClientService.getUser(ClientID);
   }
@@ -23,8 +23,13 @@ export class ClientController {
 export class BasketController {
   constructor(private readonly BasketService: BasketService) { }
 
-  @Get('/Basket/:ClientID')
-  async getBasket(@Param('ClientID') ClientID: string): Promise<Basket> {
+  @Post('/addBasket')
+  async addBasket(@Body() BasketDto: BasketDto) {
+    return this.BasketService.addBasket(BasketDto);
+  }
+
+  @Get('/:ClientID')
+  async getBasket(@Param('ClientID') ClientID: string) {
     return this.BasketService.getBasket(ClientID);
   }
 }
@@ -33,11 +38,14 @@ export class BasketController {
 export class AuctionController {
   constructor(private readonly AuctionService: AuctionService) { }
 
+  @Post('/addAuction')
+  async addAuction(@Body() AuctionDto: AuctionDto) {
+    return this.AuctionService.addAuction(AuctionDto);
+  }
+
   @Get('/getAuctions')
-  async getAuctions(): Promise<Auction> {
-    return new Promise((resolve) => {
-      return this.AuctionService.getAuctions();
-    });
+  async getAuctions(): Promise<Auction[]> {
+    return this.AuctionService.getAuctions();
   }
 
   @Get('/getAuction/:AuctionID')
@@ -45,14 +53,14 @@ export class AuctionController {
     return this.AuctionService.getAuction(AuctionID);
   }
 
-  @Put('/editAuction')
+  @Put('/editAuction/:AuctionID')
   async editAuction(@Param('AuctionID') AuctionID: string, @Body() AuctionDto: AuctionDto) {
     return this.AuctionService.editAuction(AuctionID, AuctionDto);
   }
 
-  @Delete('/deleteAuction')
-  async deleteAuction(@Param('AuctionID') AuctionID: string, @Body() AuctionDto: AuctionDto) {
-    return this.AuctionService.deleteAuction(AuctionID, AuctionDto);
+  @Delete('/deleteAuction/:AuctionID')
+  async deleteAuction(@Param('AuctionID') AuctionID: string) {
+    return this.AuctionService.deleteAuction(AuctionID);
   }
 }
 
@@ -60,11 +68,14 @@ export class AuctionController {
 export class LotController {
   constructor(private readonly LotService: LotService) { }
 
+  @Post('/addLot')
+  async addLot(@Body() LotDto: LotDto) {
+    return this.LotService.addLot(LotDto);
+  }
+
   @Get('/getLots')
-  async getLots(): Promise<Lot> {
-    return new Promise((resolve) => {
-      return this.LotService.getLots();
-    });
+  async getLots(): Promise<Lot[]> {
+    return this.LotService.getLots();
   }
 
   @Get('/getLot/:LotID')
@@ -72,13 +83,13 @@ export class LotController {
     return this.LotService.getLot(LotID);
   }
 
-  @Put('/editLot')
+  @Put('/editLot/:LotId')
   async editLot(@Param('LotID') LotID: string, @Body() LotDto: LotDto) {
     return this.LotService.editLot(LotID, LotDto);
   }
 
-  @Delete('/deleteLot')
-  async deleteLot(@Param('LotID') LotID: string, @Body() LotDto: LotDto) {
-    return this.LotService.deleteLot(LotID, LotDto);
+  @Delete('/deleteLot/:LotId')
+  async deleteLot(@Param('LotID') LotID: string) {
+    return this.LotService.deleteLot(LotID);
   }
 }

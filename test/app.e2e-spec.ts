@@ -1,24 +1,35 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import {ClientModule} from 'src/client/client.module';
+import {ClientService} from 'src/client/client.service';
+import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 
-describe('AppController (e2e)', () => {
+describe('Client',()=>{
   let app: INestApplication;
-
-  beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
+  let clientService = {findAll:()=> ['test']};
+  beforeAll(async ()=>{
+    const moduleRef = await Test.createTestingModule({
+      imports: [ClientModule],
+    })
+    .overrideProvider(ClientService)
+    .useValue(clientService)
+    .compile();
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    );
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
-
-  it('/ (GET)', () => {
+  it(`/Get client`,()=>{
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+    .get('/clients')
+    .expect(200)
+    .expect({
+      data: clientService.findAll(),
+    });
+  });
+  afterAll(async()=>{
+    await app.close();
   });
 });
