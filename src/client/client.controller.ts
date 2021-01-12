@@ -16,7 +16,6 @@ export class ClientController {
   async getUser(@Param('ClientID') ClientID: string) {
     return this.ClientService.getUser(ClientID);
   }
-
 }
 
 @Controller('Basket')
